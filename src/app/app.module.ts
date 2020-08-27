@@ -7,6 +7,8 @@ import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
+import { InMemoryWebApiModule } from 'angular-in-memory-web-api';
+
 
 import { FuseModule } from '@fuse/fuse.module';
 import { FuseSharedModule } from '@fuse/shared.module';
@@ -14,15 +16,20 @@ import { FuseProgressBarModule, FuseSidebarModule, FuseThemeOptionsModule } from
 
 import { fuseConfig } from 'app/fuse-config';
 
+import { FakeDbService } from 'app/fake-db/fake-db.service';
 import { AppComponent } from 'app/app.component';
 import { LayoutModule } from 'app/layout/layout.module';
-import { SampleModule } from 'app/main/sample/sample.module';
 
 const appRoutes: Routes = [
     {
-        path      : '**',
-        redirectTo: 'sample'
-    }
+        path        : '',
+        pathMatch: 'full',
+        redirectTo: 'apps/e-commerce/products'
+    },
+    {
+        path        : 'apps',
+        loadChildren: () => import('./main/apps/apps.module').then(m => m.AppsModule)
+    },
 ];
 
 @NgModule({
@@ -36,6 +43,11 @@ const appRoutes: Routes = [
         RouterModule.forRoot(appRoutes),
 
         TranslateModule.forRoot(),
+
+        InMemoryWebApiModule.forRoot(FakeDbService, {
+            delay             : 0,
+            passThruUnknownUrl: true
+        }),
 
         // Material moment date module
         MatMomentDateModule,
@@ -53,7 +65,6 @@ const appRoutes: Routes = [
 
         // App modules
         LayoutModule,
-        SampleModule
     ],
     bootstrap   : [
         AppComponent
